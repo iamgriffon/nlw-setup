@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "@nlw-setup/server",
   "version": "1.0.0",
   "description": "back-end portion of our project",
   "main": "index.ts",

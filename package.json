@@ -1,0 +1,28 @@
+{
+  "name": "nlw-setup",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MonoRepo for NLW-Setup",
+  "scripts": {
+    "compile": "tsc -b -w -i",
+    "web:dev":"cd ./packages/client && yarn dev",
+    "server:dev": "cd ./packages/server && yarn server",
+    "mobile:dev": "cd ./packages/mobile && yarn start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamgriffon/nlw-setup.git"
+  },
+  "author": "iamgriffon",
+  "bugs": {
+    "url": "https://github.com/iamgriffon/nlw-setup/issues"
+  },
+  "homepage": "https://github.com/iamgriffon/nlw-setup#readme",
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "react": "^18.1.0",
+    "typescript": "^4.9.4"
+  }
+}
