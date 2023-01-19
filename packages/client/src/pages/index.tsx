@@ -1,20 +1,16 @@
+import { SummaryTable } from '@/components/SummaryTable'
 import type { NextPage } from 'next'
-import { trpc } from '../utils/trpc'
+import { Header } from '@/components/Header'
 
 const Home: NextPage = () => {
 
-  const {data, isLoading, isFetched ,isSuccess} = trpc.hello.useQuery({
-    text: null
-  });
-
-  console.log('I am loading', isLoading);
-  console.log('I am Fetched', isFetched);
-  console.log('I have Succeded', isSuccess);
-
   return (
-    <>
-    {data?.greeting && <>{data.greeting}</>}
-    </>
+    <div className='w-screen h-screen flex justify-center items-center'>
+      <div className='w-full max-w-5xl px-6 flex flex-col gap-16'>
+        <Header />
+        <SummaryTable />
+      </div>
+    </div>
   )
 }
 

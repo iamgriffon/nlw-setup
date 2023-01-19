@@ -11,28 +11,32 @@ datasource db {
 }
 
 model Task {
-  id         String        @id @default(uuid())
+  id         String   @id @default(uuid())
   title      String
   created_at DateTime
-  taskDay    TaskDay[]
-  weekDays   TaskWeekDay[]
+
+  taskDays TaskDay[]
+  weekDays TaskWeekDays[]
 
   @@map("tasks")
 }
 
-model TaskWeekDay {
+model TaskWeekDays {
   id       String @id @default(uuid())
   task_id  String
   week_day Int
-  task     Task   @relation(fields: [task_id], references: [id])
 
-  @@map("task_week_days")
+  task Task @relation(fields: [task_id], references: [id])
+
+  @@unique([task_id, week_day])
+  @@map("habit_week_days")
 }
 
 model Day {
-  id      String    @id @default(uuid())
-  date    DateTime  @default(now())
-  taskDay TaskDay[]
+  id   String   @id @default(uuid())
+  date DateTime
+
+  taskDays TaskDay[]
 
   @@unique([date])
   @@map("days")
@@ -45,4 +49,7 @@ model TaskDay {
 
   day  Day  @relation(fields: [day_id], references: [id])
   task Task @relation(fields: [task_id], references: [id])
+
+  @@unique([day_id, task_id])
+  @@map("task_days")
 }
