@@ -9,10 +9,7 @@
     "server:dev": "cd ./packages/server && yarn server",
     "mobile:dev": "cd ./packages/mobile && yarn start"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/iamgriffon/nlw-setup.git"
-  },
+  "repository": "git+https://github.com/iamgriffon/nlw-setup.git",
   "author": "iamgriffon",
   "bugs": {
     "url": "https://github.com/iamgriffon/nlw-setup/issues"
@@ -22,8 +19,16 @@
     "packages/*"
   ],
   "dependencies": {
-    "react": "^18.1.0",
     "typescript": "^4.9.4",
     "zod": "^3.20.2"
-  }
+  },
+  "devDependencies": {
+    "@types/node": "18.11.18",
+    "@types/react": "18.0.26",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.4"
+  },
+  "main": "index.js",
+  "license": "MIT"
 }
