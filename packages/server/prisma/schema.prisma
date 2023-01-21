@@ -29,7 +29,7 @@ model TaskWeekDays {
   task Task @relation(fields: [task_id], references: [id])
 
   @@unique([task_id, week_day])
-  @@map("habit_week_days")
+  @@map("task_week_days")
 }
 
 model Day {

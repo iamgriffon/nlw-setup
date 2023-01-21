@@ -28,12 +28,12 @@ export async function appRoutes(app: FastifyInstance) {
     })
   });
 
-  app.get('/tasks', async() => {
+  app.get('/tasks', async () => {
     const data = prisma.task.findMany();
     return data;
   });
 
-  app.get('/day', async(request) => {
+  app.get('/day', async (request) => {
 
     const getDayParams = z.object({
       date: z.coerce.date(),
@@ -57,7 +57,7 @@ export async function appRoutes(app: FastifyInstance) {
     })
     const completedHabits = await prisma.day.findUnique({
       where: {
-          date: parsedDate
+        date: parsedDate
       },
       include: {
         taskDays: true
@@ -71,8 +71,93 @@ export async function appRoutes(app: FastifyInstance) {
   });
 
   app.get('/test', async () => {
-    const data = await prisma.day.findMany();
+    // const data = await prisma.taskWeekDays.findMany();
+
+    const data = await prisma.day.findMany()
     return data;
-  })
+  });
+
+  app.patch('/tasks/:id/toggle', async (request) => {
+    const toggleTaskParams = z.object({
+      id: z.string().uuid()
+    });
+
+    const { id } = toggleTaskParams.parse(request.params);
+
+    const today = dayjs().startOf('day').toDate();
+
+    //Get today's date (normalized)
+    let day = await prisma.day.findUnique({
+      where: {
+        date: today
+      }
+    });
+
+    //"Create a day" if there isn't one.
+    if (!day) {
+     const newDay = await prisma.day.create({
+        data: {
+          date: today
+        }
+      });
+      return newDay;
+    };
+
+    // Check if user has already finished tasks in for that day
+    const taskDay = await prisma.taskDay.findUnique({
+      where: {
+        day_id_task_id: {
+          day_id: day.id,
+          task_id: id
+        }
+      }
+    })
+
+    console.log(taskDay)
+
+    if (taskDay) {
+      //if there's a taskDay, remove one
+      await prisma.taskDay.delete({
+        where: {
+          id: taskDay.id
+        }
+      })
+      //if there's isn't one, then create a new registry (for a task-day)
+    } else {
+      await prisma.taskDay.create({
+        data: {
+          day_id: day.id,
+          task_id: id
+        }
+      })
+    }
+  });
+
+  app.get('/summary', async () => {
+    const summary = await prisma.$queryRaw`
+      SELECT
+        D.id,
+        D.date, 
+        (
+          SELECT 
+          cast(COUNT(*) as float)
+          FROM task_days TD
+          WHERE TD.day_id = D.id
+        ) as completedTasks,
+        (
+          SELECT
+            cast(COUNT(*) as float)
+            FROM task_week_days TWD
+            JOIN tasks T 
+            on T.id = TWD.task_id
+            WHERE 
+              TWD.week_day = cast(strftime('%w', D.date/1000.0, 'unixepoch') as int)
+            AND T.created_at <= D.date
+        ) as amount
+      FROM days D
+    `
+    return summary;
+  });
+
 }
 
