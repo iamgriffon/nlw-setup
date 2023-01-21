@@ -1,4 +1,4 @@
-import { string, z } from 'zod';
+import { z } from 'zod';
 
 import * as trpc from '../trpc';
 
@@ -27,7 +27,9 @@ export const appRouter = trpc.router(
       )
     )
     .query(async () => {
-     return await fetch('http://localhost:4000/summary').then(res => res.json()).then(data => data);
+      const data = await fetch('http://localhost:4000/summary').then(res => res.json()).then(data => data)
+      console.log(data)
+     return data;
      })
     });
 // export type definition of API
