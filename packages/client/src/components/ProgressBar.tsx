@@ -13,7 +13,7 @@ export function ProgressBar(props: ProgressBarProps) {
   return (
     <Progress.Root className='h-3 rounded-xl bg-zinc-700 w-full mt-4'>
       <Progress.Indicator 
-        className='h-3 rounded-xl bg-gradient-to-r from-violet-900 to-violet-500' 
+        className='h-3 rounded-xl bg-gradient-to-r from-violet-900 to-violet-500 transition-all' 
         aria-valuenow={props.progress} 
         style={progressStyles} />
     </Progress.Root>

@@ -2,12 +2,17 @@ import { generateRangeDatesFromYearStart } from "@/utils/generate-range-between-
 import { TaskDaySquare } from "./TaskDaySquare"
 import dayjs from 'dayjs'
 import { Summary } from "@/pages";
+import { useEffect, useState } from "react";
+import { trpc } from "@/utils/trpc";
 
-interface SummaryTableProps {
-  summary: Summary
-}
+export function SummaryTable() {
 
-export function SummaryTable({summary}: SummaryTableProps) {
+  const [summary, setSummary] = useState<Summary>([])
+  const { data } = trpc.get_summary.useQuery();
+
+  useEffect(() => {
+    data ? setSummary(data) : setSummary([]);
+  }, [data])
 
   const DAYS_OF_WEEK = [
     'D',
@@ -38,19 +43,17 @@ export function SummaryTable({summary}: SummaryTableProps) {
 
 
       <div className="grid grid-rows-6 grid-flow-col gap-3">
-        {summaryDates.map(date => {
+        {summary.length > 0 && summaryDates.map(date => {
           const dayInSummary = summary?.find((day) => {
             return dayjs(date).isSame(day.date, 'day')
           })
 
-          const strigifiedDate = dayjs(date)
-
           return (
             <TaskDaySquare
               key={date.toString()}
-              date={strigifiedDate}
+              date={date}
               amount={dayInSummary?.amount || 0}
-              completed={dayInSummary?.completedTasks}
+              defaultCompleted={dayInSummary?.completedTasks}
             />)
         })}
 
