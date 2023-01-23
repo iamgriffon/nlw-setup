@@ -1,11 +1,11 @@
+import { trpc } from '@/utils/trpc';
 import * as PopOver from '@radix-ui/react-popover';
 import clsx from 'clsx';
-import { CheckBox } from './Checkbox';
-import { ProgressBar } from './ProgressBar';
 import dayjs from 'dayjs'
+import { TaskDayPopOver } from './TaskDayPopOver';
 
 interface TaskDaySquareProps {
-  date: Date
+  date: dayjs.Dayjs
   amount?: number
   completed?: number
 }
@@ -13,7 +13,9 @@ interface TaskDaySquareProps {
 export function TaskDaySquare({ amount = 0, completed = 0, date }: TaskDaySquareProps) {
   const percentageProgress = amount > 0 ? Math.round((completed / amount) * 100) : 0;
   const dayAndMonth = dayjs(date).format('DD/MM');
-  const dayOfWeek = dayjs(date).format('dddd')
+  const dayOfWeek = dayjs(date).format('dddd');
+  const getDate = date.toISOString()
+  const currentTasks = trpc.get_tasks.useQuery().data
 
   return (
     <PopOver.Root>
@@ -26,24 +28,9 @@ export function TaskDaySquare({ amount = 0, completed = 0, date }: TaskDaySquare
         'bg-violet-500 border-violet-300': percentageProgress >= 80,
       })} />
 
-      <PopOver.Portal>
-        <PopOver.Content className="min-w-[320px] p-6 rounded-2xl bg-zinc-900 flex flex-col">
-          <span className='font-semibold text-zinc-400'>{dayOfWeek}</span>
-            <span className='mt-1 font-extrabold leading-tight text-3xl'>{dayAndMonth}</span>
-          <span className='font-semibold text-zinc-400'>Progress: {percentageProgress}%</span>
 
-          <ProgressBar progress={percentageProgress} />
+      <TaskDayPopOver dayAndMonth={dayAndMonth} dayOfWeek={dayOfWeek} percentageProgress={percentageProgress} date={date.toISOString()} currentTasks={currentTasks} />
 
-          <div className="mt-6 flex flex-col gap-3">
-            <CheckBox title='Drink 2L of water'/>
-            <CheckBox title='Study NextJS '/>
-            <CheckBox title='Raid Progress w/ Guild'/>
-            <CheckBox title='Do Homework'/>
-          </div>
-
-          <PopOver.Arrow height={8} width={16} className='fill-zinc-900' />
-        </PopOver.Content>
-      </PopOver.Portal>
     </PopOver.Root>
   )
 }
