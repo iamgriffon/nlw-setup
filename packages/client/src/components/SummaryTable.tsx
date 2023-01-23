@@ -4,9 +4,9 @@ import { trpc } from "@/utils/trpc";
 import { inferRouterOutputs } from "@trpc/server";
 import { TaskDaySquare } from "./TaskDaySquare"
 import dayjs from 'dayjs'
+import { useMemo } from "react";
 
 type RouterOutput = inferRouterOutputs<AppRouter>
-type SummaryProps = RouterOutput['get_tasks']
 
 export function SummaryTable() {
 
@@ -26,6 +26,10 @@ export function SummaryTable() {
   const amountOfDaysToFill = minimumSummaryDatesSize - summaryDates.length;
 
   const summary = trpc.get_tasks.useQuery().data;
+
+  useMemo(() => {
+    summary
+  }, [summary])
 
   return (
     <div className="w-full flex">

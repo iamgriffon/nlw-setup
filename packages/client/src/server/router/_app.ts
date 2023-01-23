@@ -1,20 +1,10 @@
+import { Api } from '@/utils/api';
 import { z } from 'zod';
 
 import * as trpc from '../trpc';
 
 export const appRouter = trpc.router(
   {
-    hello: trpc.procedure
-      .input(
-        z.object({
-          text: z.string().nullable(),
-        }),
-      )
-      .query(({ input }) => {
-        return {
-          greeting: `Hello ${input?.text ?? "from tRPC"}`,
-        };
-      }),
     get_tasks: trpc.procedure.
     output(
       z.array(
@@ -27,10 +17,23 @@ export const appRouter = trpc.router(
       )
     )
     .query(async () => {
-      const data = await fetch('http://localhost:4000/summary').then(res => res.json()).then(data => data)
+      const data = await Api.get('summary').then(res => res.data)
       console.log(data)
      return data;
-     })
+     }),
+
+     add_task: trpc.procedure.
+      input(
+        z.object({
+          title: z.string(),
+          weekDays: z.array(z.number())
+        })
+      )
+      .mutation(({input}) => {
+        Api.post('tasks', 
+          input
+        )
+      })
     });
 // export type definition of API
 export type AppRouter = typeof appRouter;

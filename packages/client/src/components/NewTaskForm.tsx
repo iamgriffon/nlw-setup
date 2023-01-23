@@ -1,37 +1,46 @@
 import { trpc } from "@/utils/trpc";
-import * as z from 'zod';
 import { Check } from "phosphor-react";
-import * as Checkbox from '@radix-ui/react-checkbox';
+import * as Checkbox from "@radix-ui/react-checkbox"
 import { FormEvent, useState } from "react";
-import _ from 'lodash'
 
 const AVAILABLE_WEEK_DAYS = [
-  { id: 1, day: 'Sunday' },
-  { id: 2, day: 'Monday' },
-  { id: 3, day: 'Tuesday' },
-  { id: 4, day: 'Wednesday' },
-  { id: 5, day: 'Thursday' },
-  { id: 6, day: 'Friday' },
-  { id: 7, day: 'Saturday' },
+  { id: 0, day: 'Sunday' },
+  { id: 1, day: 'Monday' },
+  { id: 2, day: 'Tuesday' },
+  { id: 3, day: 'Wednesday' },
+  { id: 4, day: 'Thursday' },
+  { id: 5, day: 'Friday' },
+  { id: 6, day: 'Saturday' },
 ]
 
 
 export function NewTaskForm() {
 
   const [title, setTitle] = useState<string>('')
-  const [weekDays, setWeekDays] = useState<Number[]>([]);
+  const [weekDays, setWeekDays] = useState<number[]>([]);
 
-  function handleCreateTask(Event: FormEvent){
+  const addTask = trpc.add_task.useMutation({
+    onSuccess: () => {
+      console.log('I succeded!');
+      setWeekDays([]);
+      setTitle('');
+    },
+  });
+
+  function handleCreateTask(Event: FormEvent) {
     Event.preventDefault();
-    const data = {
+
+    if (!title || weekDays.length === 0) return;
+
+    const input = {
       title: title,
-      week_days: weekDays
+      weekDays: weekDays
     }
-    console.log(data)
+    addTask.mutate(input)
   }
 
-  function handleAddTaskDay(taskDay: number){
-    if(weekDays.includes(taskDay)) {
+  function handleAddTaskDay(taskDay: number) {
+    if (weekDays.includes(taskDay)) {
       const updatedWeekDays = weekDays.filter(day => day !== taskDay);
       setWeekDays(updatedWeekDays)
       console.log(updatedWeekDays)
@@ -64,28 +73,28 @@ export function NewTaskForm() {
 
 
       <div className="mt-6 flex flex-col gap-3">
-        {AVAILABLE_WEEK_DAYS.map((day) => {
+        {AVAILABLE_WEEK_DAYS.map((day, index) => {
           return (
-                <Checkbox.Root
-                  defaultChecked={false}
-                  className='flex items-center gap-3 group'
-                  key={day.id}
-                  onClick={() => handleAddTaskDay(day.id)}
-                >
+            <Checkbox.Root
+              defaultChecked={false}
+              className='flex items-center gap-3 group'
+              key={day.id}
+              onClick={() => handleAddTaskDay(day.id)}
+              checked={weekDays.includes(index)}
+            >
 
-                  <div className='h-8 w-8 rounded-lg flex items-center justify-center bg-zinc-900 border-2 border-zinc-800 group-data-[state=checked]:bg-green-500 group-data-[state=checked]:border-green-500'>
-                    <Checkbox.Indicator>
-                      <Check size={20} className='text-white' />
-                    </Checkbox.Indicator>
-                  </div>
+              <div className='h-8 w-8 rounded-lg flex items-center justify-center bg-zinc-900 border-2 border-zinc-800 group-data-[state=checked]:bg-green-500 group-data-[state=checked]:border-green-500'>
+                <Checkbox.Indicator>
+                  <Check size={20} className='text-white' />
+                </Checkbox.Indicator>
+              </div>
 
-                  <span className='font-semibold text-white leading-tight'>
-                    {day.day}
-                  </span>
-                </Checkbox.Root>
-              )} 
+              <span className='font-semibold text-white leading-tight'>
+                {day.day}
+              </span>
+            </Checkbox.Root>
           )
-        }
+        })}
       </div>
 
       <button type="submit" className="mt-6 rounded-lg p-4 flex gap-3 items-center justify-center font-semibold bg-green-600 hover:bg-green-500">
